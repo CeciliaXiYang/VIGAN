@@ -1,4 +1,5 @@
-# VIGAN (reference: https://github.com/chaoshangcs/VIGAN)
+# VIGAN 
+(reference: https://github.com/chaoshangcs/VIGAN)
 
 This is a PyTorch implementation of the paper "[VIGAN: Missing View Imputation with Generative Adversarial Networks](https://arxiv.org/abs/1708.06724)". Please cite the paper in your publications if you find the source code useful to your research.
 
