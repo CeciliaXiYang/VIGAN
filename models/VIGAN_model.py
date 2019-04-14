@@ -181,7 +181,7 @@ class VIGANModel(BaseModel):
     def backward_AE_pretrain(self):
         # Autoencoder loss
         AErealA, AErealB = self.AE.forward(self.real_A, self.real_B)
-        self.loss_AE_pre = self.criterionAE(AErealA, self.real_A) + self.criterionAE(AErealB, self.real_A)
+        self.loss_AE_pre = self.criterionAE(AErealA.view(1,28,28), self.real_A) + self.criterionAE(AErealB.view(1,28,28), self.real_A)
         self.loss_AE_pre.backward()
 
     def backward_AE(self):
@@ -193,12 +193,12 @@ class VIGANModel(BaseModel):
         # Autoencoder loss: fakeA
         AEfakeA, AErealB = self.AE.forward(self.fake_A, self.real_B)
         self.loss_AE_fA_rB = (
-                             self.criterionAE(AEfakeA, self.real_A) + self.criterionAE(AErealB, self.real_B)) * 1
+                             self.criterionAE(AEfakeA.view(1,28,28), self.real_A) + self.criterionAE(AErealB.view(1,28,28), self.real_B)) * 1
 
         # Autoencoder loss: fakeB
         AErealA, AEfakeB = self.AE.forward(self.real_A, self.fake_B)
         self.loss_AE_rA_fB = (
-                             self.criterionAE(AErealA, self.real_A) + self.criterionAE(AEfakeB, self.real_B)) * 1
+                             self.criterionAE(AErealA.view(1,28,28), self.real_A) + self.criterionAE(AEfakeB.view(1,28,28), self.real_B)) * 1
 
         # combined loss
         self.loss_AE = (self.loss_AE_fA_rB + self.loss_AE_rA_fB) * 0.5
@@ -235,11 +235,11 @@ class VIGANModel(BaseModel):
 
         # Autoencoder loss: fakeA
         self.AEfakeA, AErealB = self.AE.forward(self.fake_A, self.real_B)
-        self.loss_AE_fA_rB = (self.criterionAE(self.AEfakeA, self.real_A) + self.criterionAE(AErealB, self.real_B)) * 1
+        self.loss_AE_fA_rB = (self.criterionAE(self.AEfakeA.view(1,28,28), self.real_A) + self.criterionAE(AErealB.view(1,28,28), self.real_B)) * 1
 
         # Autoencoder loss: fakeB
         AErealA, self.AEfakeB = self.AE.forward(self.real_A, self.fake_B)
-        self.loss_AE_rA_fB = (self.criterionAE(AErealA, self.real_A) + self.criterionAE(self.AEfakeB, self.real_B)) * 1
+        self.loss_AE_rA_fB = (self.criterionAE(AErealA.view(1,28,28), self.real_A) + self.criterionAE(self.AEfakeB.view(1,28,28), self.real_B)) * 1
         self.loss_AE = (self.loss_AE_fA_rB + self.loss_AE_rA_fB)
 
         # D loss
@@ -306,15 +306,15 @@ class VIGANModel(BaseModel):
     # Get errors for visualization
     ############################################################################################
     def get_current_errors_cycle(self):
-        AE_D_A = self.loss_D_A.data[0]
-        AE_G_A = self.loss_G_A.data[0]
-        Cyc_A = self.loss_cycle_A.data[0]
-        AE_D_B = self.loss_D_B.data[0]
-        AE_G_B = self.loss_G_B.data[0]
-        Cyc_B = self.loss_cycle_B.data[0]
+        AE_D_A = self.loss_D_A.data
+        AE_G_A = self.loss_G_A.data
+        Cyc_A = self.loss_cycle_A.data
+        AE_D_B = self.loss_D_B.data
+        AE_G_B = self.loss_G_B.data
+        Cyc_B = self.loss_cycle_B.data
         if self.opt.identity > 0.0:
-            idt_A = self.loss_idt_A.data[0]
-            idt_B = self.loss_idt_B.data[0]
+            idt_A = self.loss_idt_A.data
+            idt_B = self.loss_idt_B.data
             return OrderedDict([('D_A', AE_D_A), ('G_A', AE_G_A), ('Cyc_A', Cyc_A), ('idt_A', idt_A),
                                 ('D_B', AE_D_B), ('G_B', AE_G_B), ('Cyc_B', Cyc_B), ('idt_B', idt_B)])
         else:
@@ -322,15 +322,15 @@ class VIGANModel(BaseModel):
                                 ('D_B', AE_D_B), ('G_B', AE_G_B), ('Cyc_B', Cyc_B)])
 
     def get_current_errors(self):
-        D_A = self.loss_D_A_AE.data[0]
-        G_A = self.loss_AE_GA.data[0]
-        Cyc_A = self.loss_cycle_A_AE.data[0]
-        D_B = self.loss_D_B_AE.data[0]
-        G_B = self.loss_AE_GB.data[0]
-        Cyc_B = self.loss_cycle_B_AE.data[0]
+        D_A = self.loss_D_A_AE.data
+        G_A = self.loss_AE_GA.data
+        Cyc_A = self.loss_cycle_A_AE.data
+        D_B = self.loss_D_B_AE.data
+        G_B = self.loss_AE_GB.data
+        Cyc_B = self.loss_cycle_B_AE.data
         if self.opt.identity > 0.0:
-            idt_A = self.loss_idt_A.data[0]
-            idt_B = self.loss_idt_B.data[0]
+            idt_A = self.loss_idt_A.data
+            idt_B = self.loss_idt_B.data
             return OrderedDict([('D_A', D_A), ('G_A', G_A), ('Cyc_A', Cyc_A), ('idt_A', idt_A),
                                 ('D_B', D_B), ('G_B', G_B), ('Cyc_B', Cyc_B), ('idt_B', idt_B)])
         else:
