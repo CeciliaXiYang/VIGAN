@@ -1,3 +1,4 @@
+# Fit the data to code
 import time
 from options.train_options import TrainOptions
 opt = TrainOptions().parse()  # set CUDA_VISIBLE_DEVICES before import torch
